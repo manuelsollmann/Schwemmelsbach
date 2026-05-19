@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import { supabase } from '@/lib/supabase';
 import { Profile, UserRole } from '@/types';
 
@@ -75,7 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ? { status: existing }
         : await Notifications.requestPermissionsAsync();
       if (status !== 'granted') return;
-      const { data: token } = await Notifications.getExpoPushTokenAsync();
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+      const { data: token } = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
       await supabase.from('push_tokens').upsert({ user_id: userId, token }, { onConflict: 'user_id,token' });
     } catch {}
   };

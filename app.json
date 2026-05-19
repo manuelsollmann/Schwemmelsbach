@@ -37,11 +37,21 @@
       "expo-web-browser",
       [
         "expo-notifications",
-        { "icon": "./assets/icon.png", "color": "#2d5a2d" }
+        {
+          "icon": "./assets/icon.png",
+          "color": "#2d5a2d"
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "26576998-947a-41e5-9481-d4191b202370"
+      }
+    },
+    "owner": "manuelsollmann"
   }
 }
