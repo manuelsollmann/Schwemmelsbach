@@ -7,7 +7,9 @@ import { useAuth } from '@/context/AuthContext';
 export default function RegisterScreen() {
   const router = useRouter();
   const { signUp } = useAuth();
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,11 +17,14 @@ export default function RegisterScreen() {
   const [success, setSuccess] = useState(false);
 
   const handleRegister = async () => {
-    if (!fullName.trim() || !email.trim() || !password) { setError('Bitte alle Felder ausfüllen.'); return; }
+    if (!firstName.trim()) { setError('Bitte Vornamen eingeben.'); return; }
+    if (!lastName.trim()) { setError('Bitte Nachnamen eingeben.'); return; }
+    if (!email.trim()) { setError('Bitte E-Mail eingeben.'); return; }
+    if (!password) { setError('Bitte Passwort eingeben.'); return; }
     if (password.length < 6) { setError('Passwort muss mindestens 6 Zeichen haben.'); return; }
     setLoading(true);
     setError('');
-    const err = await signUp(email.trim(), password, fullName.trim());
+    const err = await signUp(email.trim(), password, firstName.trim(), lastName.trim(), phone.trim() || undefined);
     setLoading(false);
     if (err) setError(err);
     else setSuccess(true);
@@ -46,14 +51,62 @@ export default function RegisterScreen() {
 
         {error ? <View style={styles.errorBox}><Text style={styles.errorText}>{error}</Text></View> : null}
 
-        <Text style={styles.label}>Vollständiger Name</Text>
-        <TextInput style={styles.input} value={fullName} onChangeText={setFullName} placeholder="Vor- und Nachname" placeholderTextColor={Theme.colors.textMuted} />
+        <View style={styles.nameRow}>
+          <View style={styles.nameField}>
+            <Text style={styles.label}>Vorname *</Text>
+            <TextInput
+              style={styles.input}
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Max"
+              placeholderTextColor={Theme.colors.textMuted}
+              autoCorrect={false}
+            />
+          </View>
+          <View style={styles.nameField}>
+            <Text style={styles.label}>Nachname *</Text>
+            <TextInput
+              style={styles.input}
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Mustermann"
+              placeholderTextColor={Theme.colors.textMuted}
+              autoCorrect={false}
+            />
+          </View>
+        </View>
 
-        <Text style={styles.label}>E-Mail</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} placeholder="deine@email.de" placeholderTextColor={Theme.colors.textMuted} />
+        <Text style={styles.label}>Handynummer <Text style={styles.optional}>(optional)</Text></Text>
+        <TextInput
+          style={styles.input}
+          value={phone}
+          onChangeText={setPhone}
+          keyboardType="phone-pad"
+          placeholder="+49 151 12345678"
+          placeholderTextColor={Theme.colors.textMuted}
+        />
 
-        <Text style={styles.label}>Passwort</Text>
-        <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry placeholder="Mindestens 6 Zeichen" placeholderTextColor={Theme.colors.textMuted} />
+        <Text style={styles.label}>E-Mail *</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholder="deine@email.de"
+          placeholderTextColor={Theme.colors.textMuted}
+        />
+
+        <Text style={styles.label}>Passwort *</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholder="Mindestens 6 Zeichen"
+          placeholderTextColor={Theme.colors.textMuted}
+        />
 
         <Text style={styles.hint}>Mit der Registrierung stimmst du unserer Datenschutzerklärung zu.</Text>
 
@@ -74,7 +127,10 @@ const styles = StyleSheet.create({
   content: { padding: Theme.spacing.lg, gap: Theme.spacing.sm, paddingTop: Theme.spacing.xl },
   headline: { color: Theme.colors.textPrimary, fontSize: Theme.font.sizeXxl, fontWeight: Theme.font.weightBold, marginBottom: 4 },
   sub: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeMd, marginBottom: Theme.spacing.lg },
+  nameRow: { flexDirection: 'row', gap: Theme.spacing.sm },
+  nameField: { flex: 1 },
   label: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeSm, fontWeight: Theme.font.weightBold, marginBottom: 6, marginTop: 8 },
+  optional: { color: Theme.colors.textMuted, fontWeight: '400' },
   input: { backgroundColor: Theme.colors.surface, color: Theme.colors.textPrimary, borderRadius: Theme.radius.md, padding: 14, fontSize: Theme.font.sizeMd, borderWidth: 1, borderColor: Theme.colors.border },
   hint: { color: Theme.colors.textMuted, fontSize: Theme.font.sizeSm, marginTop: 4 },
   btn: { backgroundColor: Theme.colors.primary, padding: 16, borderRadius: Theme.radius.lg, alignItems: 'center', marginTop: Theme.spacing.md },

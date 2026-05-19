@@ -168,6 +168,16 @@ create policy "Nutzer können sich abmelden" on event_registrations for delete u
 
 -- Helferlisten: jeder kann lesen
 create policy "Helferlisten sind öffentlich lesbar" on helper_lists for select using (true);
+create policy "Editoren können Helferlisten erstellen" on helper_lists for insert with check (
+  exists (select 1 from profiles where id = auth.uid() and role in ('editor', 'club_admin', 'admin'))
+);
 create policy "Helferlisten Slots sind öffentlich lesbar" on helper_slots for select using (true);
+create policy "Editoren können Helfer-Slots erstellen" on helper_slots for insert with check (
+  exists (
+    select 1 from helper_lists hl
+    join profiles p on p.id = auth.uid()
+    where hl.id = list_id and p.role in ('editor', 'club_admin', 'admin')
+  )
+);
 create policy "Nutzer können sich als Helfer eintragen" on helper_registrations for insert with check (auth.uid() = user_id);
 create policy "Nutzer können sich austragen" on helper_registrations for delete using (auth.uid() = user_id);

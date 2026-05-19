@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { Theme } from '@/constants/theme';
 import { Club } from '@/types';
-import { useAuth } from '@/context/AuthContext';
 
 export default function ClubsScreen() {
-  const { isAdmin } = useAuth();
+  const router = useRouter();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -23,7 +23,7 @@ export default function ClubsScreen() {
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
 
   const renderItem = ({ item }: { item: Club }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => router.push(`/clubs/${item.id}`)}>
       <View style={styles.logo}>
         {item.logo_url
           ? <Image source={{ uri: item.logo_url }} style={styles.logoImg} />

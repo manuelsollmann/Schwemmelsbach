@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '@/context/AuthContext';
@@ -17,7 +16,12 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)/login" options={{ title: 'Anmelden', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="(auth)/register" options={{ title: 'Registrieren', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="news/[id]" options={{ title: 'Neuigkeit', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="news/create" options={{ title: 'Neuigkeit erstellen', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="events/[id]" options={{ title: 'Veranstaltung', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="events/create" options={{ title: 'Veranstaltung erstellen', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="clubs/[id]" options={{ title: 'Verein', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="helpers/[id]" options={{ title: 'Helferliste', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="helpers/create" options={{ title: 'Helferliste erstellen', headerBackTitle: 'Zurück' }} />
       </Stack>
     </AuthProvider>
   );

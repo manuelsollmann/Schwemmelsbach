@@ -28,7 +28,7 @@ export default function HelpersScreen() {
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
 
   const renderItem = ({ item }: { item: HelperList }) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => router.push(`/helpers/${item.id}`)}>
       <View style={styles.cardHeader}>
         <View style={styles.iconWrap}>
           <Ionicons name="hand-left-outline" size={24} color={Theme.colors.primary} />
@@ -67,7 +67,7 @@ export default function HelpersScreen() {
         }
       />
       {canEdit && (
-        <TouchableOpacity style={styles.fab}>
+        <TouchableOpacity style={styles.fab} onPress={() => router.push('/helpers/create')}>
           <Ionicons name="add" size={28} color="#fff" />
         </TouchableOpacity>
       )}

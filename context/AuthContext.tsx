@@ -13,7 +13,7 @@ type AuthContextType = {
   canEdit: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<string | null>;
-  signUp: (email: string, password: string, fullName: string) => Promise<string | null>;
+  signUp: (email: string, password: string, firstName: string, lastName: string, phone?: string) => Promise<string | null>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -65,11 +65,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return error?.message ?? null;
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string, phone?: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: { data: { first_name: firstName, last_name: lastName, full_name: `${firstName} ${lastName}`, phone: phone ?? null } },
     });
     return error?.message ?? null;
   };
