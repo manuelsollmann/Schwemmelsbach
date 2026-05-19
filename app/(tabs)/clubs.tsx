@@ -5,9 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { Theme } from '@/constants/theme';
 import { Club } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ClubsScreen() {
   const router = useRouter();
+  const { isAdmin } = useAuth();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,6 +56,11 @@ export default function ClubsScreen() {
           ) : null
         }
       />
+      {isAdmin && (
+        <TouchableOpacity style={styles.fab} onPress={() => router.push('/clubs/create')}>
+          <Ionicons name="add" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -69,4 +76,5 @@ const styles = StyleSheet.create({
   desc: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeSm, marginTop: 3 },
   empty: { alignItems: 'center', paddingTop: 80, gap: 12 },
   emptyText: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeMd },
+  fab: { position: 'absolute', right: 20, bottom: 24, backgroundColor: Theme.colors.primary, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', elevation: 4 },
 });

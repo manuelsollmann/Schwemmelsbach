@@ -20,6 +20,7 @@ export default function RootLayout() {
         <Stack.Screen name="events/[id]" options={{ title: 'Veranstaltung', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="events/create" options={{ title: 'Veranstaltung erstellen', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="clubs/[id]" options={{ title: 'Verein', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="clubs/create" options={{ title: 'Verein anlegen', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="helpers/[id]" options={{ title: 'Helferliste', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="helpers/create" options={{ title: 'Helferliste erstellen', headerBackTitle: 'Zurück' }} />
       </Stack>
