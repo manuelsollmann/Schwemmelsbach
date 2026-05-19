@@ -64,7 +64,7 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.section}>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/profile/edit')}>
           <Ionicons name="person-outline" size={22} color={Theme.colors.textSecondary} />
           <Text style={styles.menuLabel}>Profil bearbeiten</Text>
           <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
@@ -74,6 +74,13 @@ export default function ProfileScreen() {
           <Text style={styles.menuLabel}>Benachrichtigungen</Text>
           <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
         </TouchableOpacity>
+        {role === 'admin' && (
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/admin')}>
+            <Ionicons name="settings-outline" size={22} color={Theme.colors.admin} />
+            <Text style={[styles.menuLabel, { color: Theme.colors.admin }]}>Admin-Panel</Text>
+            <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.menuItem}>
           <Ionicons name="shield-outline" size={22} color={Theme.colors.textSecondary} />
           <Text style={styles.menuLabel}>Datenschutz</Text>

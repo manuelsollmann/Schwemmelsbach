@@ -1,7 +1,18 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
+import * as Notifications from 'expo-notifications';
 import { supabase } from '@/lib/supabase';
 import { Profile, UserRole } from '@/types';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 type AuthContextType = {
   session: Session | null;
@@ -54,6 +65,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
     setProfile(data);
     setIsLoaded(true);
+    registerPushToken(userId);
+  };
+
+  const registerPushToken = async (userId: string) => {
+    try {
+      const { status: existing } = await Notifications.getPermissionsAsync();
+      const { status } = existing === 'granted'
+        ? { status: existing }
+        : await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') return;
+      const { data: token } = await Notifications.getExpoPushTokenAsync();
+      await supabase.from('push_tokens').upsert({ user_id: userId, token }, { onConflict: 'user_id,token' });
+    } catch {}
   };
 
   const refreshProfile = async () => {

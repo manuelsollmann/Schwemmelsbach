@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { sendPushNotification } from '@/lib/notifications';
 import { Theme } from '@/constants/theme';
 import { Club } from '@/types';
 import { useAuth } from '@/context/AuthContext';
@@ -44,6 +45,7 @@ export default function CreateEventScreen() {
     });
     setSaving(false);
     if (error) { Alert.alert('Fehler', error.message); return; }
+    await sendPushNotification('Neue Veranstaltung', title.trim());
     router.back();
   };
 
