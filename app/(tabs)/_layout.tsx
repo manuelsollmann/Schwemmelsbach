@@ -1,10 +1,13 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Theme } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 
 export default function TabsLayout() {
   const { isAdmin, canEdit } = useAuth();
+  const router = useRouter();
+  const searchBtn = <TouchableOpacity onPress={() => router.push('/search')} style={{ marginRight: 16 }}><Ionicons name="search-outline" size={22} color={Theme.colors.textPrimary} /></TouchableOpacity>;
 
   return (
     <Tabs screenOptions={{
@@ -20,6 +23,7 @@ export default function TabsLayout() {
         options={{
           title: 'Neuigkeiten',
           tabBarIcon: ({ color, size }) => <Ionicons name="newspaper-outline" size={size} color={color} />,
+          headerRight: () => searchBtn,
         }}
       />
       <Tabs.Screen
@@ -27,6 +31,7 @@ export default function TabsLayout() {
         options={{
           title: 'Veranstaltungen',
           tabBarIcon: ({ color, size }) => <Ionicons name="calendar-outline" size={size} color={color} />,
+          headerRight: () => searchBtn,
         }}
       />
       <Tabs.Screen

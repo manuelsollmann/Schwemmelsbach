@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { Theme } from '@/constants/theme';
@@ -9,17 +9,14 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { session, isGuest } = useAuth();
+  const router = useRouter();
+  const { session, isGuest, isAdmin } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
 
   const load = async () => {
-    const { data } = await supabase
-      .from('events')
-      .select('*, club:clubs(name)')
-      .eq('id', id)
-      .single();
+    const { data } = await supabase.from('events').select('*, club:clubs(name)').eq('id', id).single();
     if (data && session) {
       const { count } = await supabase.from('event_registrations').select('*', { count: 'exact', head: true }).eq('event_id', id);
       const { data: reg } = await supabase.from('event_registrations').select('id').eq('event_id', id).eq('user_id', session.user.id).single();
@@ -32,6 +29,8 @@ export default function EventDetailScreen() {
 
   useEffect(() => { load(); }, [id]);
 
+  const canManage = event && (event.created_by === session?.user.id || isAdmin);
+
   const toggleRegistration = async () => {
     if (!session) { Alert.alert('Anmelden', 'Bitte melde dich an um dich zu einer Veranstaltung anzumelden.'); return; }
     setRegistering(true);
@@ -42,6 +41,16 @@ export default function EventDetailScreen() {
     }
     await load();
     setRegistering(false);
+  };
+
+  const handleDelete = () => {
+    Alert.alert('Löschen', 'Diese Veranstaltung wirklich löschen?', [
+      { text: 'Abbrechen', style: 'cancel' },
+      { text: 'Löschen', style: 'destructive', onPress: async () => {
+        await supabase.from('events').delete().eq('id', id);
+        router.back();
+      }},
+    ]);
   };
 
   if (loading) return <View style={styles.center}><ActivityIndicator color={Theme.colors.primary} size="large" /></View>;
@@ -88,6 +97,19 @@ export default function EventDetailScreen() {
           ? <ActivityIndicator color="#fff" />
           : <Text style={styles.registerText}>{isFull ? 'Ausgebucht' : event.is_registered ? 'Abmelden' : 'Anmelden'}</Text>}
       </TouchableOpacity>
+
+      {canManage && (
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.editBtn} onPress={() => router.push(`/events/edit?id=${id}`)}>
+            <Ionicons name="pencil-outline" size={18} color={Theme.colors.primary} />
+            <Text style={styles.editText}>Bearbeiten</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
+            <Ionicons name="trash-outline" size={18} color={Theme.colors.danger} />
+            <Text style={styles.deleteText}>Löschen</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -111,4 +133,9 @@ const styles = StyleSheet.create({
   fullBtn: { backgroundColor: Theme.colors.surface, borderWidth: 1, borderColor: Theme.colors.border },
   registerText: { color: '#fff', fontSize: Theme.font.sizeMd, fontWeight: Theme.font.weightBold },
   error: { color: Theme.colors.textSecondary },
+  actions: { flexDirection: 'row', gap: Theme.spacing.sm },
+  editBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: Theme.radius.md, borderWidth: 1, borderColor: Theme.colors.primary },
+  editText: { color: Theme.colors.primary, fontSize: Theme.font.sizeSm, fontWeight: Theme.font.weightBold },
+  deleteBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: Theme.radius.md, borderWidth: 1, borderColor: Theme.colors.danger },
+  deleteText: { color: Theme.colors.danger, fontSize: Theme.font.sizeSm, fontWeight: Theme.font.weightBold },
 });

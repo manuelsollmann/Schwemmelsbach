@@ -69,6 +69,11 @@ export default function ProfileScreen() {
           <Text style={styles.menuLabel}>Profil bearbeiten</Text>
           <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
         </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/my-activity')}>
+          <Ionicons name="calendar-outline" size={22} color={Theme.colors.textSecondary} />
+          <Text style={styles.menuLabel}>Meine Aktivitäten</Text>
+          <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
           <Ionicons name="notifications-outline" size={22} color={Theme.colors.textSecondary} />
           <Text style={styles.menuLabel}>Benachrichtigungen</Text>
