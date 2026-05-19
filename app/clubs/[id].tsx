@@ -41,7 +41,7 @@ export default function ClubDetailScreen() {
         <View style={styles.logo}>
           {club.logo_url
             ? <Image source={{ uri: club.logo_url }} style={styles.logoImg} />
-            : <Ionicons name="shield-outline" size={48} color={Theme.colors.primary} />}
+            : <Ionicons name={(club.icon ?? 'shield-outline') as any} size={48} color={Theme.colors.primary} />}
         </View>
         <Text style={styles.name}>{club.name}</Text>
         {club.description && <Text style={styles.desc}>{club.description}</Text>}

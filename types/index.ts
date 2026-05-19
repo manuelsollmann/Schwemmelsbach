@@ -17,6 +17,7 @@ export type Club = {
   name: string;
   description: string | null;
   logo_url: string | null;
+  icon: string | null;
   created_at: string;
 };
 

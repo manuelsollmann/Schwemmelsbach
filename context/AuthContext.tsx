@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
     setProfile(data);
     setIsLoaded(true);
-    registerPushToken(userId);
+    setTimeout(() => registerPushToken(userId), 2000);
   };
 
   const registerPushToken = async (userId: string) => {

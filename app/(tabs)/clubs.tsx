@@ -29,7 +29,7 @@ export default function ClubsScreen() {
       <View style={styles.logo}>
         {item.logo_url
           ? <Image source={{ uri: item.logo_url }} style={styles.logoImg} />
-          : <Ionicons name="shield-outline" size={32} color={Theme.colors.primary} />}
+          : <Ionicons name={(item.icon ?? 'shield-outline') as any} size={32} color={Theme.colors.primary} />}
       </View>
       <View style={styles.info}>
         <Text style={styles.name}>{item.name}</Text>
