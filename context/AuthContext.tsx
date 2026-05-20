@@ -24,6 +24,8 @@ type AuthContextType = {
   isGuest: boolean;
   canEdit: boolean;
   isAdmin: boolean;
+  adminClubIds: string[];
+  canManageContent: (clubId: string | null, authorId?: string | null) => boolean;
   signIn: (email: string, password: string) => Promise<string | null>;
   signUp: (email: string, password: string, firstName: string, lastName: string, phone?: string) => Promise<string | null>;
   signOut: () => Promise<void>;
@@ -35,6 +37,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [adminClubIds, setAdminClubIds] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const role: UserRole = profile?.role ?? 'guest';
@@ -59,12 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    setProfile(data);
+    const [{ data: profileData }, { data: memberships }] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', userId).single(),
+      supabase.from('club_memberships').select('club_id').eq('user_id', userId).eq('role', 'admin'),
+    ]);
+    setProfile(profileData);
+    setAdminClubIds(memberships?.map(m => m.club_id) ?? []);
     setIsLoaded(true);
     setTimeout(() => registerPushToken(userId), 2000);
   };
@@ -80,6 +83,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: token } = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
       await supabase.from('push_tokens').upsert({ user_id: userId, token }, { onConflict: 'user_id,token' });
     } catch {}
+  };
+
+  const canManageContent = (clubId: string | null, _authorId?: string | null): boolean => {
+    if (role === 'admin') return true;
+    if (role === 'club_admin' && clubId && adminClubIds.includes(clubId)) return true;
+    return false;
   };
 
   const refreshProfile = async () => {
@@ -107,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={{
       session, user: session?.user ?? null, profile, role,
-      isLoaded, isGuest, canEdit, isAdmin,
+      isLoaded, isGuest, canEdit, isAdmin, adminClubIds, canManageContent,
       signIn, signUp, signOut, refreshProfile,
     }}>
       {children}

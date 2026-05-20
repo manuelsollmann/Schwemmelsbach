@@ -14,6 +14,8 @@ export default function CreateHelperListScreen() {
   const { session } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
   const [selectedClub, setSelectedClub] = useState<string | null>(null);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [slots, setSlots] = useState<Slot[]>([{ task: '', maxHelpers: '1' }]);
@@ -30,13 +32,19 @@ export default function CreateHelperListScreen() {
 
   const save = async () => {
     if (!title.trim()) { Alert.alert('Fehler', 'Bitte einen Titel eingeben.'); return; }
+    if (!date.trim()) { Alert.alert('Fehler', 'Bitte ein Datum eingeben.'); return; }
     const validSlots = slots.filter(s => s.task.trim());
     if (validSlots.length === 0) { Alert.alert('Fehler', 'Bitte mindestens eine Aufgabe eingeben.'); return; }
+
+    const [day, month, year] = date.split('.');
+    const dateObj = new Date(`${year}-${month}-${day}T${time || '00:00'}:00`);
+    if (isNaN(dateObj.getTime())) { Alert.alert('Fehler', 'Ungültiges Datum.'); return; }
 
     setSaving(true);
     const { data: list, error } = await supabase.from('helper_lists').insert({
       title: title.trim(),
       description: description.trim() || null,
+      date: dateObj.toISOString(),
       club_id: selectedClub,
       created_by: session!.user.id,
     }).select().single();
@@ -61,6 +69,17 @@ export default function CreateHelperListScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.label}>Titel *</Text>
         <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder="z.B. Aufbauhelfer Sommerfest" placeholderTextColor={Theme.colors.textMuted} />
+
+        <View style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>Datum * <Text style={styles.optional}>TT.MM.JJJJ</Text></Text>
+            <TextInput style={styles.input} value={date} onChangeText={setDate} keyboardType="numbers-and-punctuation" placeholderTextColor={Theme.colors.textMuted} />
+          </View>
+          <View style={{ width: 100 }}>
+            <Text style={styles.label}>Uhrzeit</Text>
+            <TextInput style={styles.input} value={time} onChangeText={setTime} placeholder="08:00" keyboardType="numbers-and-punctuation" placeholderTextColor={Theme.colors.textMuted} />
+          </View>
+        </View>
 
         <Text style={styles.label}>Beschreibung <Text style={styles.optional}>(optional)</Text></Text>
         <TextInput
@@ -131,6 +150,7 @@ export default function CreateHelperListScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Theme.colors.background },
   content: { padding: Theme.spacing.lg, gap: Theme.spacing.sm, paddingBottom: 40 },
+  row: { flexDirection: 'row', gap: Theme.spacing.sm },
   label: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeSm, fontWeight: Theme.font.weightBold, marginBottom: 6, marginTop: 8 },
   optional: { color: Theme.colors.textMuted, fontWeight: '400' },
   input: { backgroundColor: Theme.colors.surface, color: Theme.colors.textPrimary, borderRadius: Theme.radius.md, padding: 14, fontSize: Theme.font.sizeMd, borderWidth: 1, borderColor: Theme.colors.border },

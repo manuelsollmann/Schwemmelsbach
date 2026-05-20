@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { session, isGuest, isAdmin } = useAuth();
+  const { session, isGuest, canManageContent } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
@@ -29,7 +29,7 @@ export default function EventDetailScreen() {
 
   useEffect(() => { load(); }, [id]);
 
-  const canManage = event && (event.created_by === session?.user.id || isAdmin);
+  const canManage = event && canManageContent(event.club_id);
 
   const toggleRegistration = async () => {
     if (!session) { Alert.alert('Anmelden', 'Bitte melde dich an um dich zu einer Veranstaltung anzumelden.'); return; }

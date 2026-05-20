@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a2e1a"
+      "backgroundColor": "#0d1117"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,14 +20,14 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a2e1a"
+        "backgroundColor": "#0d1117"
       },
       "package": "de.schwemmelsbach.app",
       "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
@@ -39,7 +39,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#2d5a2d"
+          "color": "#6366f1"
         }
       ]
     ],

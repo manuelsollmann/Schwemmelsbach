@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function NewsDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { session, isAdmin } = useAuth();
+  const { canManageContent } = useAuth();
   const [post, setPost] = useState<NewsPost | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export default function NewsDetailScreen() {
       .then(({ data }) => { setPost(data); setLoading(false); });
   }, [id]);
 
-  const canManage = post && (post.author_id === session?.user.id || isAdmin);
+  const canManage = post && canManageContent(post.club_id);
 
   const handleDelete = () => {
     Alert.alert('Löschen', 'Diese Neuigkeit wirklich löschen?', [

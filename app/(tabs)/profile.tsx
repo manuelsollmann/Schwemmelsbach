@@ -86,12 +86,12 @@ export default function ProfileScreen() {
             <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/legal/datenschutz')}>
           <Ionicons name="shield-outline" size={22} color={Theme.colors.textSecondary} />
           <Text style={styles.menuLabel}>Datenschutz</Text>
           <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/legal/impressum')}>
           <Ionicons name="information-circle-outline" size={22} color={Theme.colors.textSecondary} />
           <Text style={styles.menuLabel}>Impressum</Text>
           <Ionicons name="chevron-forward" size={18} color={Theme.colors.textMuted} />

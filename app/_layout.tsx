@@ -7,10 +7,10 @@ export default function RootLayout() {
     <AuthProvider>
       <StatusBar style="light" />
       <Stack screenOptions={{
-        headerStyle: { backgroundColor: '#1a2e1a' },
-        headerTintColor: '#f0f5f0',
+        headerStyle: { backgroundColor: '#161b22' },
+        headerTintColor: '#e6edf3',
         headerTitleStyle: { fontWeight: '700' },
-        contentStyle: { backgroundColor: '#0f1a0f' },
+        contentStyle: { backgroundColor: '#0d1117' },
       }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)/login" options={{ title: 'Anmelden', headerBackTitle: 'Zurück' }} />
@@ -30,6 +30,9 @@ export default function RootLayout() {
         <Stack.Screen name="admin/users" options={{ title: 'Nutzerverwaltung', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="helpers/[id]" options={{ title: 'Helferliste', headerBackTitle: 'Zurück' }} />
         <Stack.Screen name="helpers/create" options={{ title: 'Helferliste erstellen', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="helpers/edit" options={{ title: 'Helferliste bearbeiten', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="legal/impressum" options={{ title: 'Impressum', headerBackTitle: 'Zurück' }} />
+        <Stack.Screen name="legal/datenschutz" options={{ title: 'Datenschutz', headerBackTitle: 'Zurück' }} />
       </Stack>
     </AuthProvider>
   );

@@ -29,7 +29,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="events"
         options={{
-          title: 'Veranstaltungen',
+          title: 'Kalender',
           tabBarIcon: ({ color, size }) => <Ionicons name="calendar-outline" size={size} color={color} />,
           headerRight: () => searchBtn,
         }}
