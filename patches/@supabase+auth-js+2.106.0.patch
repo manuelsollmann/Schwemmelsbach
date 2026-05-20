@@ -1,0 +1,100 @@
+diff --git a/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js b/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js
+index b614897..4c374fa 100644
+--- a/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js
++++ b/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js
+@@ -4061,7 +4061,7 @@ class GoTrueClient {
+             ticker.unref();
+             // @ts-expect-error TS has no context of Deno
+         }
+-        else if (typeof Deno !== 'undefined' && typeof Deno.unrefTimer === 'function') {
++        else if (typeof globalThis.Deno !== 'undefined' && typeof globalThis.Deno?.unrefTimer === 'function') {
+             // similar like for NodeJS, but with the Deno API
+             // https://deno.land/api@latest?unstable&s=Deno.unrefTimer
+             // @ts-expect-error TS has no context of Deno
+@@ -4079,7 +4079,7 @@ class GoTrueClient {
+             timeout.unref();
+             // @ts-expect-error TS has no context of Deno
+         }
+-        else if (typeof Deno !== 'undefined' && typeof Deno.unrefTimer === 'function') {
++        else if (typeof globalThis.Deno !== 'undefined' && typeof globalThis.Deno?.unrefTimer === 'function') {
+             // @ts-expect-error TS has no context of Deno
+             Deno.unrefTimer(timeout);
+         }
+diff --git a/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js b/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js
+index 35e1c89..4e4ad76 100644
+--- a/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js
++++ b/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js
+@@ -83,9 +83,9 @@ function deserializeCredentialCreationOptions(options) {
+         throw new Error('Credential creation options are required');
+     }
+     // Check if the native parseCreationOptionsFromJSON method is available
+-    if (typeof PublicKeyCredential !== 'undefined' &&
++    if (typeof globalThis.PublicKeyCredential !== 'undefined' &&
+         'parseCreationOptionsFromJSON' in PublicKeyCredential &&
+-        typeof PublicKeyCredential
++        typeof globalThis.PublicKeyCredential
+             .parseCreationOptionsFromJSON === 'function') {
+         // Use the native WebAuthn Level 3 method
+         return PublicKeyCredential.parseCreationOptionsFromJSON(
+@@ -130,9 +130,9 @@ function deserializeCredentialRequestOptions(options) {
+         throw new Error('Credential request options are required');
+     }
+     // Check if the native parseRequestOptionsFromJSON method is available
+-    if (typeof PublicKeyCredential !== 'undefined' &&
++    if (typeof globalThis.PublicKeyCredential !== 'undefined' &&
+         'parseRequestOptionsFromJSON' in PublicKeyCredential &&
+-        typeof PublicKeyCredential
++        typeof globalThis.PublicKeyCredential
+             .parseRequestOptionsFromJSON === 'function') {
+         // Use the native WebAuthn Level 3 method
+         return PublicKeyCredential.parseRequestOptionsFromJSON(options);
+diff --git a/node_modules/@supabase/auth-js/dist/module/GoTrueClient.js b/node_modules/@supabase/auth-js/dist/module/GoTrueClient.js
+index d673c08..e5d220c 100644
+--- a/node_modules/@supabase/auth-js/dist/module/GoTrueClient.js
++++ b/node_modules/@supabase/auth-js/dist/module/GoTrueClient.js
+@@ -4058,7 +4058,7 @@ class GoTrueClient {
+             ticker.unref();
+             // @ts-expect-error TS has no context of Deno
+         }
+-        else if (typeof Deno !== 'undefined' && typeof Deno.unrefTimer === 'function') {
++        else if (typeof globalThis.Deno !== 'undefined' && typeof globalThis.Deno?.unrefTimer === 'function') {
+             // similar like for NodeJS, but with the Deno API
+             // https://deno.land/api@latest?unstable&s=Deno.unrefTimer
+             // @ts-expect-error TS has no context of Deno
+@@ -4076,7 +4076,7 @@ class GoTrueClient {
+             timeout.unref();
+             // @ts-expect-error TS has no context of Deno
+         }
+-        else if (typeof Deno !== 'undefined' && typeof Deno.unrefTimer === 'function') {
++        else if (typeof globalThis.Deno !== 'undefined' && typeof globalThis.Deno?.unrefTimer === 'function') {
+             // @ts-expect-error TS has no context of Deno
+             Deno.unrefTimer(timeout);
+         }
+diff --git a/node_modules/@supabase/auth-js/dist/module/lib/webauthn.js b/node_modules/@supabase/auth-js/dist/module/lib/webauthn.js
+index 574fb87..1522416 100644
+--- a/node_modules/@supabase/auth-js/dist/module/lib/webauthn.js
++++ b/node_modules/@supabase/auth-js/dist/module/lib/webauthn.js
+@@ -66,9 +66,9 @@ export function deserializeCredentialCreationOptions(options) {
+         throw new Error('Credential creation options are required');
+     }
+     // Check if the native parseCreationOptionsFromJSON method is available
+-    if (typeof PublicKeyCredential !== 'undefined' &&
++    if (typeof globalThis.PublicKeyCredential !== 'undefined' &&
+         'parseCreationOptionsFromJSON' in PublicKeyCredential &&
+-        typeof PublicKeyCredential
++        typeof globalThis.PublicKeyCredential
+             .parseCreationOptionsFromJSON === 'function') {
+         // Use the native WebAuthn Level 3 method
+         return PublicKeyCredential.parseCreationOptionsFromJSON(
+@@ -113,9 +113,9 @@ export function deserializeCredentialRequestOptions(options) {
+         throw new Error('Credential request options are required');
+     }
+     // Check if the native parseRequestOptionsFromJSON method is available
+-    if (typeof PublicKeyCredential !== 'undefined' &&
++    if (typeof globalThis.PublicKeyCredential !== 'undefined' &&
+         'parseRequestOptionsFromJSON' in PublicKeyCredential &&
+-        typeof PublicKeyCredential
++        typeof globalThis.PublicKeyCredential
+             .parseRequestOptionsFromJSON === 'function') {
+         // Use the native WebAuthn Level 3 method
+         return PublicKeyCredential.parseRequestOptionsFromJSON(options);
