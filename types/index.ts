@@ -1,5 +1,20 @@
 export type UserRole = 'guest' | 'member' | 'editor' | 'club_admin' | 'admin';
 
+export type Gemeinde = {
+  id: string;
+  name: string;
+  slug: string;
+  active: boolean;
+  created_at: string;
+};
+
+export type Village = {
+  id: string;
+  gemeinde_id: string;
+  name: string;
+  created_at: string;
+};
+
 export type Profile = {
   id: string;
   email: string;
@@ -9,6 +24,9 @@ export type Profile = {
   phone: string | null;
   avatar_url: string | null;
   role: UserRole;
+  gemeinde_id: string | null;
+  village_id: string | null;
+  village?: Village;
   created_at: string;
 };
 
@@ -18,6 +36,8 @@ export type Club = {
   description: string | null;
   logo_url: string | null;
   icon: string | null;
+  gemeinde_id: string | null;
+  village_id: string | null;
   created_at: string;
 };
 
@@ -30,6 +50,8 @@ export type NewsPost = {
   author?: Profile;
   club_id: string | null;
   club?: Club;
+  gemeinde_id: string | null;
+  village_id: string | null;
   published_at: string;
   created_at: string;
 };
@@ -47,6 +69,8 @@ export type Event = {
   is_registered?: boolean;
   club_id: string | null;
   club?: Club;
+  gemeinde_id: string | null;
+  village_id: string | null;
   created_by: string;
   created_at: string;
 };
@@ -58,6 +82,8 @@ export type HelperList = {
   event_id: string | null;
   club_id: string | null;
   club?: Club;
+  gemeinde_id: string | null;
+  village_id: string | null;
   created_by: string;
   created_at: string;
   slots?: HelperSlot[];

@@ -5,6 +5,8 @@ import Constants from 'expo-constants';
 import { supabase } from '@/lib/supabase';
 import { Profile, UserRole } from '@/types';
 
+export const WASSERLOSEN_GEMEINDE_ID = '11111111-1111-1111-1111-111111111111';
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -25,9 +27,11 @@ type AuthContextType = {
   canEdit: boolean;
   isAdmin: boolean;
   adminClubIds: string[];
+  villageId: string | null;
+  gemeindeId: string | null;
   canManageContent: (clubId: string | null, authorId?: string | null) => boolean;
   signIn: (email: string, password: string) => Promise<string | null>;
-  signUp: (email: string, password: string, firstName: string, lastName: string, phone?: string) => Promise<string | null>;
+  signUp: (email: string, password: string, firstName: string, lastName: string, villageId: string, phone?: string) => Promise<string | null>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -44,6 +48,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isGuest = !session;
   const canEdit = ['editor', 'club_admin', 'admin'].includes(role);
   const isAdmin = role === 'admin';
+  const villageId = profile?.village_id ?? null;
+  const gemeindeId = profile?.gemeinde_id ?? WASSERLOSEN_GEMEINDE_ID;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -63,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = async (userId: string) => {
     const [{ data: profileData }, { data: memberships }] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', userId).single(),
+      supabase.from('profiles').select('*, village:villages(id, name, gemeinde_id)').eq('id', userId).single(),
       supabase.from('club_memberships').select('club_id').eq('user_id', userId).eq('role', 'admin'),
     ]);
     setProfile(profileData);
@@ -100,11 +106,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return error?.message ?? null;
   };
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string, phone?: string) => {
+  const signUp = async (email: string, password: string, firstName: string, lastName: string, villageId: string, phone?: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { first_name: firstName, last_name: lastName, full_name: `${firstName} ${lastName}`, phone: phone ?? null } },
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`,
+          phone: phone ?? null,
+          village_id: villageId,
+          gemeinde_id: WASSERLOSEN_GEMEINDE_ID,
+        },
+      },
     });
     return error?.message ?? null;
   };
@@ -116,8 +131,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={{
       session, user: session?.user ?? null, profile, role,
-      isLoaded, isGuest, canEdit, isAdmin, adminClubIds, canManageContent,
-      signIn, signUp, signOut, refreshProfile,
+      isLoaded, isGuest, canEdit, isAdmin, adminClubIds,
+      villageId, gemeindeId,
+      canManageContent, signIn, signUp, signOut, refreshProfile,
     }}>
       {children}
     </AuthContext.Provider>

@@ -26,10 +26,11 @@ const ICONS: { name: string; label: string }[] = [
 
 export default function CreateClubScreen() {
   const router = useRouter();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('shield-outline');
+  const [scope, setScope] = useState<'all' | 'village'>('all');
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
@@ -40,6 +41,8 @@ export default function CreateClubScreen() {
       description: description.trim() || null,
       icon,
       created_by: session!.user.id,
+      gemeinde_id: profile?.gemeinde_id,
+      village_id: scope === 'village' ? profile?.village_id : null,
     });
     setSaving(false);
     if (error) { Alert.alert('Fehler', error.message); return; }
@@ -70,6 +73,18 @@ export default function CreateClubScreen() {
               <Text style={[styles.iconLabel, icon === i.name && styles.iconLabelActive]}>{i.label}</Text>
             </TouchableOpacity>
           ))}
+        </View>
+
+        <Text style={styles.label}>Sichtbarkeit</Text>
+        <View style={styles.scopeRow}>
+          <TouchableOpacity style={[styles.scopeBtn, scope === 'all' && styles.scopeBtnActive]} onPress={() => setScope('all')}>
+            <Text style={[styles.scopeBtnText, scope === 'all' && styles.scopeBtnTextActive]}>Alle Gemeindeteile</Text>
+          </TouchableOpacity>
+          {profile?.village && (
+            <TouchableOpacity style={[styles.scopeBtn, scope === 'village' && styles.scopeBtnActive]} onPress={() => setScope('village')}>
+              <Text style={[styles.scopeBtnText, scope === 'village' && styles.scopeBtnTextActive]}>Nur {profile.village.name}</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <Text style={styles.label}>Beschreibung <Text style={styles.optional}>(optional)</Text></Text>
@@ -104,6 +119,11 @@ const styles = StyleSheet.create({
   iconBtnActive: { backgroundColor: Theme.colors.primary, borderColor: Theme.colors.primary },
   iconLabel: { color: Theme.colors.textMuted, fontSize: 9, textAlign: 'center' },
   iconLabelActive: { color: '#fff' },
+  scopeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  scopeBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: Theme.radius.md, borderWidth: 1, borderColor: Theme.colors.border, backgroundColor: Theme.colors.surface },
+  scopeBtnActive: { backgroundColor: Theme.colors.primary, borderColor: Theme.colors.primary },
+  scopeBtnText: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeSm },
+  scopeBtnTextActive: { color: '#fff', fontWeight: Theme.font.weightBold },
   btn: { backgroundColor: Theme.colors.primary, padding: 16, borderRadius: Theme.radius.lg, alignItems: 'center', marginTop: Theme.spacing.lg },
   btnText: { color: '#fff', fontSize: Theme.font.sizeMd, fontWeight: Theme.font.weightBold },
 });

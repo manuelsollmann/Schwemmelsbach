@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function CreateEventScreen() {
   const router = useRouter();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
@@ -18,6 +18,7 @@ export default function CreateEventScreen() {
   const [maxAttendees, setMaxAttendees] = useState('');
   const [selectedClub, setSelectedClub] = useState<string | null>(null);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [scope, setScope] = useState<'all' | 'village'>('all');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -42,6 +43,8 @@ export default function CreateEventScreen() {
       max_attendees: maxAttendees ? parseInt(maxAttendees) : null,
       club_id: selectedClub,
       created_by: session!.user.id,
+      gemeinde_id: profile?.gemeinde_id,
+      village_id: scope === 'village' ? profile?.village_id : null,
     });
     setSaving(false);
     if (error) { Alert.alert('Fehler', error.message); return; }
@@ -83,6 +86,18 @@ export default function CreateEventScreen() {
           numberOfLines={5}
           textAlignVertical="top"
         />
+
+        <Text style={styles.label}>Sichtbarkeit</Text>
+        <View style={styles.clubRow}>
+          <TouchableOpacity style={[styles.clubBtn, scope === 'all' && styles.clubBtnActive]} onPress={() => setScope('all')}>
+            <Text style={[styles.clubBtnText, scope === 'all' && styles.clubBtnTextActive]}>Alle Gemeindeteile</Text>
+          </TouchableOpacity>
+          {profile?.village && (
+            <TouchableOpacity style={[styles.clubBtn, scope === 'village' && styles.clubBtnActive]} onPress={() => setScope('village')}>
+              <Text style={[styles.clubBtnText, scope === 'village' && styles.clubBtnTextActive]}>Nur {profile.village.name}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         <Text style={styles.label}>Verein <Text style={styles.optional}>(optional)</Text></Text>
         <View style={styles.clubRow}>

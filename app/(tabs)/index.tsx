@@ -9,20 +9,26 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function NewsScreen() {
   const router = useRouter();
-  const { canEdit } = useAuth();
+  const { canEdit, profile } = useAuth();
   const [posts, setPosts] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await supabase
+    let query = supabase
       .from('news')
       .select('*, author:profiles(full_name, avatar_url), club:clubs(name)')
       .order('published_at', { ascending: false })
       .limit(30);
+
+    if (profile?.village_id) {
+      query = query.or(`village_id.is.null,village_id.eq.${profile.village_id}`);
+    }
+
+    const { data } = await query;
     setPosts(data ?? []);
     setLoading(false);
-  }, []);
+  }, [profile?.village_id]);
 
   useEffect(() => { load(); }, [load]);
 

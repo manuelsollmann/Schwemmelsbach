@@ -9,19 +9,23 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function HelpersScreen() {
   const router = useRouter();
-  const { canEdit, session } = useAuth();
+  const { canEdit, session, profile } = useAuth();
   const [lists, setLists] = useState<HelperList[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await supabase
+    let query = supabase
       .from('helper_lists')
       .select('*, club:clubs(name), slots:helper_slots(id, task, max_helpers)')
       .order('created_at', { ascending: false });
+    if (profile?.village_id) {
+      query = query.or(`village_id.is.null,village_id.eq.${profile.village_id}`);
+    }
+    const { data } = await query;
     setLists(data ?? []);
     setLoading(false);
-  }, []);
+  }, [profile?.village_id]);
 
   useEffect(() => { load(); }, [load]);
 

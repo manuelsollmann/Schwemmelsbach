@@ -9,11 +9,12 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function CreateNewsScreen() {
   const router = useRouter();
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [selectedClub, setSelectedClub] = useState<string | null>(null);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [scope, setScope] = useState<'all' | 'village'>('all');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -29,6 +30,8 @@ export default function CreateNewsScreen() {
       content: content.trim(),
       club_id: selectedClub,
       author_id: session!.user.id,
+      gemeinde_id: profile?.gemeinde_id,
+      village_id: scope === 'village' ? profile?.village_id : null,
     });
     setSaving(false);
     if (error) { Alert.alert('Fehler', error.message); return; }
@@ -59,6 +62,26 @@ export default function CreateNewsScreen() {
           numberOfLines={8}
           textAlignVertical="top"
         />
+
+        <Text style={styles.label}>Sichtbarkeit</Text>
+        <View style={styles.clubRow}>
+          <TouchableOpacity
+            style={[styles.clubBtn, scope === 'all' && styles.clubBtnActive]}
+            onPress={() => setScope('all')}
+          >
+            <Text style={[styles.clubBtnText, scope === 'all' && styles.clubBtnTextActive]}>Alle Gemeindeteile</Text>
+          </TouchableOpacity>
+          {profile?.village && (
+            <TouchableOpacity
+              style={[styles.clubBtn, scope === 'village' && styles.clubBtnActive]}
+              onPress={() => setScope('village')}
+            >
+              <Text style={[styles.clubBtnText, scope === 'village' && styles.clubBtnTextActive]}>
+                Nur {profile.village.name}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         <Text style={styles.label}>Verein <Text style={styles.optional}>(optional)</Text></Text>
         <View style={styles.clubRow}>

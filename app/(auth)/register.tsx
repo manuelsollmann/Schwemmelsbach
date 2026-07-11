@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Theme } from '@/constants/theme';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, WASSERLOSEN_GEMEINDE_ID } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Village } from '@/types';
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -12,19 +14,31 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedVillage, setSelectedVillage] = useState<string | null>(null);
+  const [villages, setVillages] = useState<Village[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    supabase
+      .from('villages')
+      .select('*')
+      .eq('gemeinde_id', WASSERLOSEN_GEMEINDE_ID)
+      .order('name')
+      .then(({ data }) => setVillages(data ?? []));
+  }, []);
+
   const handleRegister = async () => {
     if (!firstName.trim()) { setError('Bitte Vornamen eingeben.'); return; }
     if (!lastName.trim()) { setError('Bitte Nachnamen eingeben.'); return; }
+    if (!selectedVillage) { setError('Bitte deinen Ortsteil auswählen.'); return; }
     if (!email.trim()) { setError('Bitte E-Mail eingeben.'); return; }
     if (!password) { setError('Bitte Passwort eingeben.'); return; }
     if (password.length < 6) { setError('Passwort muss mindestens 6 Zeichen haben.'); return; }
     setLoading(true);
     setError('');
-    const err = await signUp(email.trim(), password, firstName.trim(), lastName.trim(), phone.trim() || undefined);
+    const err = await signUp(email.trim(), password, firstName.trim(), lastName.trim(), selectedVillage, phone.trim() || undefined);
     setLoading(false);
     if (err) setError(err);
     else setSuccess(true);
@@ -47,7 +61,7 @@ export default function RegisterScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.headline}>Konto erstellen</Text>
-        <Text style={styles.sub}>Werde Teil der Schwemmelsbach-Community</Text>
+        <Text style={styles.sub}>Werde Teil der Gemeinde Wasserlosen</Text>
 
         {error ? <View style={styles.errorBox}><Text style={styles.errorText}>{error}</Text></View> : null}
 
@@ -74,6 +88,21 @@ export default function RegisterScreen() {
               autoCorrect={false}
             />
           </View>
+        </View>
+
+        <Text style={styles.label}>Ortsteil *</Text>
+        <View style={styles.villageGrid}>
+          {villages.map(v => (
+            <TouchableOpacity
+              key={v.id}
+              style={[styles.villageBtn, selectedVillage === v.id && styles.villageBtnActive]}
+              onPress={() => setSelectedVillage(v.id)}
+            >
+              <Text style={[styles.villageBtnText, selectedVillage === v.id && styles.villageBtnTextActive]}>
+                {v.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.label}>Handynummer <Text style={styles.optional}>(optional)</Text></Text>
@@ -132,6 +161,11 @@ const styles = StyleSheet.create({
   label: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeSm, fontWeight: Theme.font.weightBold, marginBottom: 6, marginTop: 8 },
   optional: { color: Theme.colors.textMuted, fontWeight: '400' },
   input: { backgroundColor: Theme.colors.surface, color: Theme.colors.textPrimary, borderRadius: Theme.radius.md, padding: 14, fontSize: Theme.font.sizeMd, borderWidth: 1, borderColor: Theme.colors.border },
+  villageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  villageBtn: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: Theme.radius.md, borderWidth: 1, borderColor: Theme.colors.border, backgroundColor: Theme.colors.surface },
+  villageBtnActive: { backgroundColor: Theme.colors.primary, borderColor: Theme.colors.primary },
+  villageBtnText: { color: Theme.colors.textSecondary, fontSize: Theme.font.sizeSm, fontWeight: Theme.font.weightBold },
+  villageBtnTextActive: { color: '#fff' },
   hint: { color: Theme.colors.textMuted, fontSize: Theme.font.sizeSm, marginTop: 4 },
   btn: { backgroundColor: Theme.colors.primary, padding: 16, borderRadius: Theme.radius.lg, alignItems: 'center', marginTop: Theme.spacing.md },
   btnText: { color: '#fff', fontSize: Theme.font.sizeMd, fontWeight: Theme.font.weightBold },

@@ -24,7 +24,7 @@ type Filter = 'all' | 'events' | 'helpers';
 
 export default function EventsScreen() {
   const router = useRouter();
-  const { canEdit, session } = useAuth();
+  const { canEdit, session, profile } = useAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
   const [loading, setLoading] = useState(true);
@@ -33,9 +33,12 @@ export default function EventsScreen() {
   const load = useCallback(async () => {
     const now = new Date().toISOString();
 
-    const queries: Promise<any>[] = [
-      supabase.from('events').select('*, club:clubs(name)').gte('date', now).order('date', { ascending: true }),
-    ];
+    let eventsQuery = supabase.from('events').select('*, club:clubs(name)').gte('date', now).order('date', { ascending: true });
+    if (profile?.village_id) {
+      eventsQuery = eventsQuery.or(`village_id.is.null,village_id.eq.${profile.village_id}`);
+    }
+
+    const queries: Promise<any>[] = [eventsQuery];
 
     if (session) {
       queries.push(
@@ -69,7 +72,7 @@ export default function EventsScreen() {
 
     setItems(merged);
     setLoading(false);
-  }, [session]);
+  }, [session, profile?.village_id]);
 
   useEffect(() => { load(); }, [load]);
 
